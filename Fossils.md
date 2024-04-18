@@ -215,7 +215,6 @@ new_labels = fossil_classifier.predict_on_new_images(new_images)
 print(new_labels)
 ```
 
-
 In this object-oriented version of the code, we define a class named FossilClassifier that 
 encapsulates all the necessary steps for loading, preprocessing, training, evaluating, and 
 predicting with the CNN model. The source URL of the dataset is passed as an argument to the class constructor, 
@@ -224,3 +223,126 @@ The class methods load_data, build_model, train, evaluate, and predict_on_new_im
 operations, providing an organized structure to the code.
 
 ### Prompt 3: Use A Kaggle API key to solve the 403 issue with data access being restricted. 
+
+Fossil Identification with Image Processing
+
+In this example, we will use a Convolutional Neural Network (CNN) for image classification to identify fossils from 
+terrain image data. For this task, we will use the Fossil Dataset from Kaggle.
+
+Install required libraries
+
+```bs
+pip install numpy pandas matplotlib tensorflow sklearn keras
+```
+
+Class for loading, preprocessing and prediction
+
+```python
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import CategoricalCrossentropy
+import kaggle
+
+class FossilClassifier:
+    def __init__(self, api_key, source_url, target_size=(224, 224), batch_size=32):
+        self.api_key = api_key
+        self.source_url = source_url
+        self.target_size = target_size
+        self.batch_size = batch_size
+
+    def load_data(self):
+        # Load dataset
+        kaggle.api.authenticate(self.api_key)
+        self.train_df = kaggle.api.competition_download_file(self.source_url)
+        self.train_df = pd.read_csv(self.train_df)
+        self.train_df, self.val_df = train_test_split(self.train_df, test_size=0.2, random_state=42)
+
+        # Create data generators for training and validation sets
+        self.train_datagen = ImageDataGenerator(rescale=1./255)
+        self.val_datagen = ImageDataGenerator(rescale=1./255)
+
+        self.train_generator = self.train_datagen.flow_from_dataframe(self.train_df, target_size=self.target_size, batch_size=self.batch_size, class_mode='categorical')
+        self.val_generator = self.val_datagen.flow_from_dataframe(self.val_df, target_size=self.target_size, batch_size=self.batch_size, class_mode='categorical')
+
+    def build_model(self):
+        # Define the CNN model architecture
+        self.model = Sequential()
+        self.model.add(Conv2D(32, (3, 3), activation='relu', input_shape=self.train_generator.input_shape))
+        self.model.add(MaxPooling2D((2, 2)))
+        self.model.add(Conv2D(64, (3, 3), activation='relu'))
+        self.model.add(MaxPooling2D((2, 2)))
+        self.model.add(Conv2D(128, (3, 3), activation='relu'))
+        self.model.add(MaxPooling2D((2, 2)))
+        self.model.add(Flatten())
+        self.model.add(Dense(128, activation='relu'))
+        self.model.add(Dense(10, activation='softmax'))
+
+        # Compile the model
+        self.model.compile(optimizer=Adam(lr=0.001), loss=CategoricalCrossentropy(), metrics=['accuracy'])
+
+    def train(self):
+        # Train the model on the training set
+        self.model.fit(self.train_generator, epochs=10, validation_data=self.val_generator)
+
+    def evaluate(self):
+        # Evaluate the model on the validation set
+        loss, accuracy = self.model.evaluate(self.val_generator)
+        print(f'Validation Accuracy: {accuracy:.2f}')
+
+    def predict_on_new_images(self, new_images):
+        # Preprocess new images
+        new_images = new_images / 255.0
+
+        # Predict on new images
+        predictions = self.model.predict(new_images)
+
+        # Get class labels from predictions
+        class_labels = np.argmax(predictions, axis=1)
+        return class_labels
+
+```
+
+#### Load data
+
+```python
+api_key = 'YOUR_KAGGLE_API_KEY'
+source_url = 'https://storage.googleapis.com/kaggle-competitions/fossil-identification/train.csv'
+fossil_classifier = FossilClassifier(api_key, source_url)
+fossil_classifier.load_data()
+```
+
+#### Build model
+
+```python
+fossil_classifier.build_model()
+```
+
+#### Train model
+
+```python
+fossil_classifier.train()
+```
+
+#### Evaluate model
+```python
+fossil_classifier.evaluate()
+```
+
+#### Predict on new images
+```python
+new_images = ...  # Load new images here
+new_labels = fossil_classifier.predict_on_new_images(new_images)
+print(new_labels)
+```
+
+In this version of the code, we use the Kaggle API to download the dataset, which requires a Kaggle API key. 
+The kaggle.api.authenticate() method is used to authenticate the API key, and the kaggle.api.competition_download_file() 
+method is used to download the dataset. The rest of the code remains the same as before.
+
+Please note that you need to replace 'YOUR_KAGGLE_API_KEY' with your actual Kaggle API key. 
+You can obtain a Kaggle API key by creating an account on Kaggle and going to the Account page.
