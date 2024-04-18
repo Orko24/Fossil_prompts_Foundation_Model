@@ -203,7 +203,7 @@ fossil_classifier.build_model()
 fossil_classifier.train()
 ```
 
-# Evaluate model
+#### Evaluate model
 ```python
 fossil_classifier.evaluate()
 ```
