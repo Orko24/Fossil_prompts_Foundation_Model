@@ -63,7 +63,7 @@ model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accur
 ```
 
 Train the model
-# Train the model on the training set
+#### Train the model on the training set
 
 ```python
 model.fit(train_generator, epochs=10, validation_data=val_generator)
@@ -73,7 +73,7 @@ model.fit(train_generator, epochs=10, validation_data=val_generator)
 
 
 
-# Evaluate the model on the validation set
+#### Evaluate the model on the validation set
 
 ```python
 loss, accuracy = model.evaluate(val_generator)
@@ -82,7 +82,7 @@ print(f'Validation Accuracy: {accuracy:.2f}')
 Predict on new images
 
 
-# Load new images
+#### Load new images
 
 ```python
 new_images = ...  # Load new images here
@@ -184,20 +184,20 @@ class FossilClassifier:
 
 ```
 
-# Load data
+#### Load data
 ```python
 source_url = 'https://storage.googleapis.com/kaggle-competitions/fossil-identification/train.csv'
 fossil_classifier = FossilClassifier(source_url)
 fossil_classifier.load_data()
 ```
 
-# Build model
+#### Build model
 
 ```python
 fossil_classifier.build_model()
 ```
 
-# Train model
+#### Train model
 
 ```python
 fossil_classifier.train()
@@ -208,7 +208,7 @@ fossil_classifier.train()
 fossil_classifier.evaluate()
 ```
 
-# Predict on new images
+#### Predict on new images
 ```python
 new_images = ...  # Load new images here
 new_labels = fossil_classifier.predict_on_new_images(new_images)
@@ -223,4 +223,4 @@ which makes it easier to switch between different datasets. The target size and 
 The class methods load_data, build_model, train, evaluate, and predict_on_new_images are used to perform the respective 
 operations, providing an organized structure to the code.
 
-
+### Prompt 3: Use A Kaggle API key to solve the 403 issue with data access being restricted. 
